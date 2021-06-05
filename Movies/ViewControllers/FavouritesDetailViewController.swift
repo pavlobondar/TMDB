@@ -8,22 +8,35 @@
 import UIKit
 
 class FavouritesDetailViewController: UIViewController {
-
+    @IBOutlet private weak var titleLabel: UILabel!
+    @IBOutlet private weak var genresLabel: UILabel!
+    
+    private var viewModel = FavouritesListViewModel()
+    
+    var movieId: Int?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        viewModel.movieDetail.bind { [weak self] _ in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                self.updateUI()
+            }
+        }
+        
+        guard let movieId = movieId else { return }
+        viewModel.fetchMovies(movieId: movieId) { movieDetail in
+            self.viewModel.movieDetail.value = FavouritesTableViewCellViewModel(movieDetail: movieDetail)
+        }
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    private func updateUI() {
+        let detail = viewModel.movieDetail.value?.movieDetail
+        titleLabel.text = detail?.title
+        
+        let genres = detail?.genres?.compactMap { $0.name } ?? []
+        genresLabel.text = genres.joined(separator: ", ")
     }
-    */
 
 }
