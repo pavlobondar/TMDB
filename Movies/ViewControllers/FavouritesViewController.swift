@@ -15,11 +15,13 @@ class FavouritesViewController: UIViewController {
         return tableView
     }()
     
-    private var movies: [MovieTableViewCellViewModel] = []
+    var viewModel: [MovieTableViewCellViewModel]!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        setupMoviesListener()
+        
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UINib(nibName: "FavoriteCell", bundle: nil), forCellReuseIdentifier: FavoriteCell.identifier)
@@ -33,34 +35,41 @@ class FavouritesViewController: UIViewController {
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationItem.title = "Favourites"
         
-        let navController = self.tabBarController?.viewControllers![0] as! UINavigationController
-        let vc = navController.topViewController as! ListViewController
-        vc.addMovie = { movie in
-            guard let movie = movie else { return }
-            self.movies.append(movie)
-        }
-        
         setupTableViewConstraints()
         tableView.reloadData()
     }
 
     private func setupTableViewConstraints() {
+        
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         tableView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         tableView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
     }
+    
+    private func setupMoviesListener() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            let navController = self.tabBarController?.viewControllers![0] as! UINavigationController
+            let vc = navController.topViewController as! ListViewController
+            vc.addMovie = { movie in
+                guard let movie = movie else { return }
+                self.viewModel.append(movie)
+            }
+        }
+    }
 }
 
 extension FavouritesViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        movies.count
+        
+        viewModel.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: FavoriteCell.identifier, for: indexPath) as! FavoriteCell
-        cell.movie = movies[indexPath.row].movie
+        cell.movie = viewModel[indexPath.row].movie
         return cell
     }
 }
@@ -70,7 +79,7 @@ extension FavouritesViewController: UITableViewDelegate {
         if editingStyle == .delete {
             
             self.tableView.beginUpdates()
-            self.movies.remove(at: indexPath.row)
+            self.viewModel.remove(at: indexPath.row)
             self.tableView.deleteRows(at: [indexPath], with: .fade)
             self.tableView.endUpdates()
         }
@@ -79,7 +88,7 @@ extension FavouritesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         let detailVC: FavouritesDetailViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "FavouritesDetailViewController") as! FavouritesDetailViewController
-        detailVC.movieId = movies[indexPath.row].movie.id
+        detailVC.movieId = viewModel[indexPath.row].movie.id
         self.present(detailVC, animated: true)
     }
 }

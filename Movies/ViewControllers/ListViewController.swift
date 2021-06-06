@@ -12,8 +12,19 @@ class ListViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     
-    private var viewModel = MoviesListViewModel()
+    private var cellIndexPath: IndexPath? {
+        willSet {
+            guard let indexPath = cellIndexPath else { return }
+            if newValue != indexPath {
+                let cell = tableView.cellForRow(at: indexPath)
+                UIView.animate(withDuration: 0.5) {
+                    cell?.alpha = 1
+                }
+            }
+        }
+    }
     
+    var viewModel: MoviesListViewModel!
     var addMovie: ((_ movie: MovieTableViewCellViewModel?) -> ())?
 
     override func viewDidLoad() {
@@ -47,17 +58,20 @@ class ListViewController: UIViewController {
     }
     
     @objc private func handleLongPress(sender: UILongPressGestureRecognizer) {
-        UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+        
         switch sender.state {
-        case .began: cellTapAnimation(sender: sender, alpha: 0.1, movie: false)
-        case .ended: cellTapAnimation(sender: sender, alpha: 1)
+        case .began: cellTapAnimation(sender: sender, alpha: 0.1)
+        case .ended: cellTapAnimation(sender: sender, alpha: 1, movie: false)
         default: break
         }
     }
 
     private func cellTapAnimation(sender: UILongPressGestureRecognizer, alpha: CGFloat, movie: Bool = true) {
+        
+        UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
         let touchPoint = sender.location(in: tableView)
         if let indexPath = tableView.indexPathForRow(at: touchPoint) {
+            cellIndexPath = indexPath
             if movie { self.addMovie?(self.viewModel.movies.value?[indexPath.row]) }
             let cell = tableView.cellForRow(at: indexPath)
             UIView.animate(withDuration: 0.5) {
@@ -75,6 +89,7 @@ extension ListViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: ListCell.identifier, for: indexPath) as! ListCell
         
         let movie = viewModel.movies.value?[indexPath.row].movie

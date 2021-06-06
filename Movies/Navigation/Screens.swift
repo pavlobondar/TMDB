@@ -14,11 +14,16 @@ final class Screens {
 extension Screens {
     func createMovieViewController() -> UIViewController {
         let viewController = storyboard.instantiateViewController(identifier: "ListViewController") as! ListViewController
+        let viewModel = MoviesListViewModel()
+        viewController.viewModel = viewModel
         return viewController
     }
     
     func createBookmarkViewController() -> UIViewController {
         let viewController = storyboard.instantiateViewController(identifier: "FavouritesViewController") as! FavouritesViewController
+        let viewModel: [MovieTableViewCellViewModel] = []
+        viewController.viewModel = viewModel
+        viewController.loadViewIfNeeded()
         return viewController
     }
 }
