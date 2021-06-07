@@ -7,7 +7,11 @@
 
 import UIKit
 
-final class MovieCoordinator {
+protocol MovieCoordinatorProtocol {
+    func showDetail(movie: MovieResult?)
+}
+
+final class MovieCoordinator: MovieCoordinatorProtocol {
     private let presenter: UINavigationController
     private let screens: Screens
     
@@ -21,7 +25,13 @@ final class MovieCoordinator {
     }
     
     private func showMovieViewController() {
-        let viewController = screens.createMovieViewController()
+        let viewController = screens.createMovieViewController(presenter: presenter, screens: screens)
         presenter.viewControllers = [viewController]
+    }
+    
+    func showDetail(movie: MovieResult?) {
+        let detailVC: MovieDetailViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "MovieDetailViewController") as! MovieDetailViewController
+        detailVC.movie = movie
+        presenter.present(detailVC, animated: true)
     }
 }

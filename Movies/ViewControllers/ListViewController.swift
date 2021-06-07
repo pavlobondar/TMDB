@@ -54,7 +54,7 @@ class ListViewController: UIViewController {
         super.viewWillAppear(true)
         
         self.navigationController?.navigationBar.prefersLargeTitles = true
-        self.navigationItem.title = "List"
+        self.navigationItem.title = viewModel.title
     }
     
     @objc private func handleLongPress(sender: UILongPressGestureRecognizer) {
@@ -108,8 +108,6 @@ extension ListViewController: UITableViewDataSource {
 extension ListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        let detailVC: MovieDetailViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "MovieDetailViewController") as! MovieDetailViewController
-        detailVC.movie = viewModel.movies.value?[indexPath.row].movie
-        self.present(detailVC, animated: true)
+        viewModel.showDetail(indexPath: indexPath)
     }
 }

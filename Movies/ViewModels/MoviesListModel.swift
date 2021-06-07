@@ -9,6 +9,8 @@ import Foundation
 
 struct MoviesListViewModel {
     var movies: Observable<[MovieTableViewCellViewModel]> = Observable([])
+    var movieCoordinator: MovieCoordinatorProtocol!
+    var title = "List"
     
     func getImagePath(path: String) -> String {
         "https://image.tmdb.org/t/p/w500\(path)"
@@ -30,6 +32,11 @@ struct MoviesListViewModel {
                 completion(result)
             }
         }
+    }
+    
+    func showDetail(indexPath: IndexPath) {
+        let movie = movies.value?[indexPath.row].movie
+        movieCoordinator.showDetail(movie: movie)
     }
 }
 

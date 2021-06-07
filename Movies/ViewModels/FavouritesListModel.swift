@@ -9,6 +9,9 @@ import Foundation
 
 struct FavouritesListViewModel {
     var movieDetail: Observable<FavouritesTableViewCellViewModel> = Observable(nil)
+    var favouritesCoordinator: BookmarkCoordinatorProtocol!
+    var movieFavorites: [MovieTableViewCellViewModel] = []
+    var title = "Favourites"
     
     func fetchMovies(movieId: Int, completion : @escaping (MovieDetail) -> ()) {
         var components = URLComponents()
@@ -26,6 +29,12 @@ struct FavouritesListViewModel {
                 completion(result)
             }
         }
+    }
+    
+    func showDetail(indexPath: IndexPath) {
+        let id = movieFavorites[indexPath.row].movie.id
+        guard let id = id else { return }
+        favouritesCoordinator.showDetail(id: id)
     }
 }
 

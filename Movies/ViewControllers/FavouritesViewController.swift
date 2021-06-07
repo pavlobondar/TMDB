@@ -15,7 +15,7 @@ class FavouritesViewController: UIViewController {
         return tableView
     }()
     
-    var viewModel: [MovieTableViewCellViewModel]!
+    var viewModel: FavouritesListViewModel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,7 +33,7 @@ class FavouritesViewController: UIViewController {
         super.viewWillAppear(true)
         
         self.navigationController?.navigationBar.prefersLargeTitles = true
-        self.navigationItem.title = "Favourites"
+        self.navigationItem.title = viewModel.title
         
         setupTableViewConstraints()
         tableView.reloadData()
@@ -54,7 +54,7 @@ class FavouritesViewController: UIViewController {
             let vc = navController.topViewController as! ListViewController
             vc.addMovie = { movie in
                 guard let movie = movie else { return }
-                self.viewModel.append(movie)
+                self.viewModel.movieFavorites.append(movie)
             }
         }
     }
@@ -63,13 +63,13 @@ class FavouritesViewController: UIViewController {
 extension FavouritesViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        viewModel.count
+        viewModel.movieFavorites.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: FavoriteCell.identifier, for: indexPath) as! FavoriteCell
-        cell.movie = viewModel[indexPath.row].movie
+        cell.movie = viewModel.movieFavorites[indexPath.row].movie
         return cell
     }
 }
@@ -79,7 +79,7 @@ extension FavouritesViewController: UITableViewDelegate {
         if editingStyle == .delete {
             
             self.tableView.beginUpdates()
-            self.viewModel.remove(at: indexPath.row)
+            self.viewModel.movieFavorites.remove(at: indexPath.row)
             self.tableView.deleteRows(at: [indexPath], with: .fade)
             self.tableView.endUpdates()
         }
@@ -87,8 +87,6 @@ extension FavouritesViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        let detailVC: FavouritesDetailViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "FavouritesDetailViewController") as! FavouritesDetailViewController
-        detailVC.movieId = viewModel[indexPath.row].movie.id
-        self.present(detailVC, animated: true)
+        viewModel.showDetail(indexPath: indexPath)
     }
 }

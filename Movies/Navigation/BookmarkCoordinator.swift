@@ -7,7 +7,11 @@
 
 import UIKit
 
-final class BookmarkCoordinator {
+protocol BookmarkCoordinatorProtocol {
+    func showDetail(id: Int)
+}
+
+final class BookmarkCoordinator: BookmarkCoordinatorProtocol {
     
     private let presenter: UINavigationController
     private let screens: Screens
@@ -22,7 +26,13 @@ final class BookmarkCoordinator {
     }
     
     private func showBookmarkViewController() {
-        let viewController = screens.createBookmarkViewController()
+        let viewController = screens.createBookmarkViewController(presenter: presenter, screens: screens)
         presenter.viewControllers = [viewController]
+    }
+    
+    func showDetail(id: Int) {
+        let detailVC: FavouritesDetailViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "FavouritesDetailViewController") as! FavouritesDetailViewController
+        detailVC.movieId = id
+        presenter.present(detailVC, animated: true)
     }
 }

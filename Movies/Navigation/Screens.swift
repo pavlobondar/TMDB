@@ -12,16 +12,22 @@ final class Screens {
 }
 
 extension Screens {
-    func createMovieViewController() -> UIViewController {
+    func createMovieViewController(presenter: UINavigationController, screens: Screens) -> UIViewController {
         let viewController = storyboard.instantiateViewController(identifier: "ListViewController") as! ListViewController
-        let viewModel = MoviesListViewModel()
+        var viewModel = MoviesListViewModel()
+        let movieCoordinator = MovieCoordinator(presenter: presenter, screens: screens)
+        
+        viewModel.movieCoordinator = movieCoordinator
         viewController.viewModel = viewModel
         return viewController
     }
     
-    func createBookmarkViewController() -> UIViewController {
+    func createBookmarkViewController(presenter: UINavigationController, screens: Screens) -> UIViewController {
         let viewController = storyboard.instantiateViewController(identifier: "FavouritesViewController") as! FavouritesViewController
-        let viewModel: [MovieTableViewCellViewModel] = []
+        var viewModel = FavouritesListViewModel()
+        let favouritesCoordinator = BookmarkCoordinator(presenter: presenter, screens: screens)
+        viewModel.favouritesCoordinator = favouritesCoordinator
+        
         viewController.viewModel = viewModel
         viewController.loadViewIfNeeded()
         return viewController
